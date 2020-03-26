@@ -6,7 +6,7 @@ import * as AWS from '../../../../aws';
 const router: Router = Router();
 
 // Get all feed items
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
     const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
     items.rows.map((item) => {
             if(item.url) {
@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 //@TODO
 //Add an endpoint to GET a specific resource by Primary Key
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id',requireAuth, async (req: Request, res: Response) => {
     const item = await FeedItem.findByPk(req.params["id"]);
     if(!item){
         res.send(400).send("could not found item with id "+req.params["id"]);
