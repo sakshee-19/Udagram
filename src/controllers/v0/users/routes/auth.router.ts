@@ -27,7 +27,7 @@ async function comparePasswords(plainTextPassword: string, hash: string): Promis
 
 function generateJWT(user: User): string {
     //@TODO Use jwt to create a new JWT Payload containing
-    return jwt.sign(user, config.jwt.secret);
+    return jwt.sign(user.toJSON(), config.jwt.secret);
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -112,22 +112,26 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     const password_hash = await generatePassword(plainTextPassword);
-
+    console.log("115");
     const newUser = await new User({
         email: email,
         password_hash: password_hash
     });
-
+    console.log("user "+newUser.email);
     let savedUser;
     try {
         savedUser = await newUser.save();
+        console.log("saving user");
     } catch (e) {
+        console.log("erron in save user"+ e)
         throw e;
     }
 
     // Generate JWT
+    console.log("generating jwt ")
     const jwt = generateJWT(savedUser);
-
+    console.log("jwt token "+jwt);
+    console.log("user saved "+savedUser);
     res.status(201).send({token: jwt, user: savedUser.short()});
 });
 
